@@ -99,7 +99,13 @@
                             <outlet property="delegate" destination="M4R-VV-FWJ" id="STS-4f-lHu"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Репозитории" id="KEf-0s-KPW"/>
+                    <navigationItem key="navigationItem" title="Репозитории" id="KEf-0s-KPW">
+                        <barButtonItem key="leftBarButtonItem" systemItem="bookmarks" id="kHX-1u-ZCY">
+                            <connections>
+                                <action selector="aboutBtn:" destination="M4R-VV-FWJ" id="hj7-Ue-C9g"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <segue destination="Oep-NQ-Ge4" kind="show" identifier="showDetails" id="QrR-ir-1Ix"/>
                     </connections>

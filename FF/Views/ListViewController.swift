@@ -14,6 +14,20 @@ import NVActivityIndicatorView
 
 class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     
+    @IBAction func aboutBtn(_ sender: Any) {
+        let alert = UIAlertController(title: "О приложении", message: "Приложение является выполненным тестовым заданием для кандидатов на позицию iOS Junior Developer в компании Family Friend.\nРазработчик: Максим Скрябин.", preferredStyle: .alert)
+        let close = UIAlertAction(title: "Закрыть", style: .cancel, handler: { _ in
+            alert.dismiss(animated: true, completion: nil)
+        })
+        let web = UIAlertAction(title: "Портфолио", style: .default, handler: { _ in
+            let url = URL(string: "http://mskr.name")!
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        })
+        alert.addAction(web)
+        alert.addAction(close)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     @objc func reloadRepos(_ sender: Any) {
         startAnimating()
         for repo in repoList {
