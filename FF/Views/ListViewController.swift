@@ -15,7 +15,7 @@ import NVActivityIndicatorView
 class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     
     @IBAction func aboutBtn(_ sender: Any) {
-        let alert = UIAlertController(title: "О приложении", message: "Приложение является выполненным тестовым заданием для кандидатов на позицию iOS Junior Developer в компании Family Friend.\nРазработчик: Максим Скрябин.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "О приложении", message: "Приложение является выполненным тестовым заданием для кандидатов на позицию iOS Junior Developer в компании Family Friend.\n\nРазработчик: Максим Скрябин.", preferredStyle: .alert)
         let close = UIAlertAction(title: "Закрыть", style: .cancel, handler: { _ in
             alert.dismiss(animated: true, completion: nil)
         })
@@ -84,6 +84,16 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
                                                 
                                                 let totalCount = 100 * (Int(pageCount)! - 1) + lastPageCount
                                                 tempRepo.setValue(totalCount, forKey: "watchCount")
+                                                
+                                                try context.save()
+                                                
+                                                if i == 29 {
+                                                    DispatchQueue.main.sync {
+                                                        self.tableView.reloadData()
+                                                        self.stopAnimating()
+                                                        self.refresher.endRefreshing()
+                                                    }
+                                                }
                                             } catch let error as NSError {
                                                 print("error while creating last page json")
                                             }
@@ -97,13 +107,6 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
                         //Запрос 2 - конец
                         
                         repoList.append(tempRepo)
-                    }
-                    
-                    try context.save()
-                    DispatchQueue.main.sync {
-                        self.tableView.reloadData()
-                        self.stopAnimating()
-                        self.refresher.endRefreshing()
                     }
                 } catch let error as NSError {
                     print("error while creating repo json")
