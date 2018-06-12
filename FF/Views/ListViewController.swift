@@ -118,7 +118,7 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
         self.tableView.refreshControl = refresher
         
         self.tableView.tableFooterView = UIView(frame: CGRect.zero)
-        self.tableView.rowHeight = UITableViewAutomaticDimension
+        //self.tableView.rowHeight = UITableViewAutomaticDimension
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -140,7 +140,7 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if repoList.count == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "emptyCell")!
-            
+
             cell.selectionStyle = .none
             return cell
         } else {
@@ -150,21 +150,21 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
             let descLbl = cell.viewWithTag(3) as! UILabel
             let starLbl = cell.viewWithTag(4) as! UILabel
             let repo = repoList[indexPath.row]
-            
+
             //Стиль
             logoImg.layer.cornerRadius = logoImg.frame.width / 2
             logoImg.layer.masksToBounds = true
-            
+
             //Содержание
             logoImg.image = UIImage(named: "swift_logo")
             nameLbl.text = (repo.value(forKey: "name") as! String)
             descLbl.text = (repo.value(forKey: "desc") as! String)
-            
+
             let formatter = NumberFormatter()
             formatter.groupingSeparator = " "
             formatter.numberStyle = .decimal
             starLbl.text = "★ \(formatter.string(from: repo.value(forKey: "starCount") as! NSNumber)!)"
-            
+
             return cell
         }
     }
@@ -173,6 +173,14 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
         if repoList.count != 0 {
             sID = indexPath.row
             self.performSegue(withIdentifier: "showDetails", sender: nil)
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if repoList.count != 0 {
+            return UITableViewAutomaticDimension
+        } else {
+            return self.tableView.frame.height
         }
     }
 }
