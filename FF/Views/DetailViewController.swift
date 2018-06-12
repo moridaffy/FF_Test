@@ -43,9 +43,9 @@ class DetailViewController: UIViewController {
         let formatter = NumberFormatter()
         formatter.groupingSeparator = " "
         formatter.numberStyle = .decimal
-        watchCounter.text = "\(formatter.string(from: repo.value(forKey: "watchCount") as! NSNumber)!)"
-        starCounter.text = "\(formatter.string(from: repo.value(forKey: "starCount") as! NSNumber)!)"
-        forkCounter.text = "\(formatter.string(from: repo.value(forKey: "forkCount") as! NSNumber)!)"
+        watchCounter.text = "\(formatter.string(from: repo.value(forKey: "watchCount") as! NSNumber) ?? "error")"
+        starCounter.text = "\(formatter.string(from: repo.value(forKey: "starCount") as! NSNumber) ?? "error")"
+        forkCounter.text = "\(formatter.string(from: repo.value(forKey: "forkCount") as! NSNumber) ?? "error")"
         
         //Расположение
         let horSpacing = (UIScreen.main.bounds.width - watchStack.frame.width - starStack.frame.width - forkStack.frame.width) / 4

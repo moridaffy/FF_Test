@@ -7,9 +7,22 @@
 //
 
 import UIKit
+import Foundation
 import CoreData
 
 var repoList: [NSManagedObject] = []
 
+let githubToken: String = "e1824194bdad8cb6082ba53d9f54e2ebc6950377"
+
 let appDelegate = UIApplication.shared.delegate as! AppDelegate
 let context = appDelegate.persistentContainer.viewContext
+
+extension String {
+    func slice(from: String, to: String) -> String? {
+        return (range(of: from)?.upperBound).flatMap { substringFrom in
+            (range(of: to, range: substringFrom..<endIndex)?.lowerBound).map { substringTo in
+                String(self[substringFrom..<substringTo])
+            }
+        }
+    }
+}

@@ -15,46 +15,89 @@ import NVActivityIndicatorView
 class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     
     @objc func reloadRepos(_ sender: Any) {
-        let requestURL = URL(string: "https://api.github.com/search/repositories?q=language:swift&sort=stars")!
         startAnimating()
-        
         for repo in repoList {
             context.delete(repo)
         }
         repoList.removeAll()
         
-        URLSession.shared.dataTask(with: requestURL) { (data, response, error) in
-            if error != nil || data == nil {
-                print("Error while loading repos URL:\n\(error.debugDescription)")
+        //Запрос 1 - получение списка репозиториев
+        let repoURL = URL(string: "https://api.github.com/search/repositories?access_token=\(githubToken)&q=language:swift&sort=stars")!
+        URLSession.shared.dataTask(with: repoURL) { (repoData, repoResponse, repoError) in
+            if repoData == nil || repoError != nil {
+                print("error at request 1")
             } else {
                 do {
-                    let json = try JSON(data: data!)
+                    let repoJSON = try JSON(data: repoData!)
                     for i in 0...29 {
                         let entity = NSEntityDescription.entity(forEntityName: "Repo", in: context)!
                         let tempRepo = NSManagedObject(entity: entity, insertInto: context)
                         
-                        tempRepo.setValue(json["items"][i]["name"].string!, forKey: "name")
-                        tempRepo.setValue(json["items"][i]["description"].string!, forKey: "desc")
-                        tempRepo.setValue(json["items"][i]["html_url"].string!, forKey: "url")
-                        tempRepo.setValue(json["items"][i]["watchers_count"].int!, forKey: "watchCount")
-                        tempRepo.setValue(json["items"][i]["stargazers_count"].int!, forKey: "starCount")
-                        tempRepo.setValue(json["items"][i]["forks_count"].int!, forKey: "forkCount")
+                        tempRepo.setValue(repoJSON["items"][i]["name"].string!, forKey: "name")
+                        tempRepo.setValue(repoJSON["items"][i]["description"].string!, forKey: "desc")
+                        tempRepo.setValue(repoJSON["items"][i]["html_url"].string!, forKey: "url")
+                        tempRepo.setValue(repoJSON["items"][i]["stargazers_count"].int!, forKey: "starCount")
+                        tempRepo.setValue(repoJSON["items"][i]["forks_count"].int!, forKey: "forkCount")
+                        
+                        //Запрос 2 - получение кол-ва страниц watcher'ов
+                        let watchURL = URL(string: "\(repoJSON["items"][i]["url"].string!)/subscribers?access_token=\(githubToken)&per_page=100")!
+                        URLSession.shared.dataTask(with: watchURL) { (watchData, watchResponse, watchError) in
+                            if watchError != nil {
+                                print("error at request 2")
+                            } else {
+                                let httpResponse = watchResponse as! HTTPURLResponse
+                                let linkHeader: String = httpResponse.allHeaderFields["Link"] as? String ?? "none"
+                                let requestsLeft: String = httpResponse.allHeaderFields["X-RateLimit-Remaining"] as! String
+                                
+                                print("API uses left: \(requestsLeft)")
+                                
+                                let lastHeader = linkHeader.slice(from: "rel=\"next\", ", to: "; rel=\"last\"") ?? "none"
+                                let pageCount = lastHeader.slice(from: "per_page=100&page=", to: ">") ?? "none"
+                                
+                                if linkHeader == "none" || lastHeader == "none" || pageCount == "none" {
+                                    print("no link header received at request 2")
+                                } else {
+                                    
+                                    //Запрос 3 - получение кол-ва watcher'ов на последней странице
+                                    let lastPageURL = URL(string: "\(repoJSON["items"][i]["url"].string!)/subscribers?access_token=\(githubToken)&per_page=100&page=\(pageCount)")!
+                                    URLSession.shared.dataTask(with: lastPageURL) { (lastPageData, lastPageResponse, lastPageError) in
+                                        if lastPageError != nil || lastPageData == nil {
+                                            print("error at request 3")
+                                        } else {
+                                            do {
+                                                let lastPageJSON = try JSON(data: lastPageData!)
+                                                let lastPageCount = lastPageJSON.count
+                                                
+                                                let totalCount = 100 * (Int(pageCount)! - 1) + lastPageCount
+                                                tempRepo.setValue(totalCount, forKey: "watchCount")
+                                            } catch let error as NSError {
+                                                print("error while creating last page json")
+                                            }
+                                        }
+                                        
+                                    }.resume()
+                                    //Запрос 3 - конец
+                                }
+                            }
+                        }.resume()
+                        //Запрос 2 - конец
                         
                         repoList.append(tempRepo)
                     }
                     
                     try context.save()
-                    
                     DispatchQueue.main.sync {
                         self.tableView.reloadData()
                         self.stopAnimating()
                         self.refresher.endRefreshing()
                     }
                 } catch let error as NSError {
-                    print("Error while creating JSON:\n\(error.debugDescription)")
+                    print("error while creating repo json")
                 }
             }
         }.resume()
+        //Запрос 1 - конец
+        
     }
     
     var sID: Int = 0
