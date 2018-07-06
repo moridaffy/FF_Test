@@ -23,7 +23,7 @@ class DetailViewController: UIViewController {
     
     @IBOutlet weak var webBtnOut: UIButton!
     @IBAction func webBtn(_ sender: Any) {
-        let url = URL(string: repoList[rID].value(forKey: "url") as! String)!
+        let url = URL(string: repositoryList[rID].url)!
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
     
@@ -37,15 +37,15 @@ class DetailViewController: UIViewController {
         webBtnOut.layer.masksToBounds = true
         
         //Содержание
-        let repo = repoList[rID]
-        navItem.title = (repoList[rID].value(forKey: "name") as! String)
+        let repo = repositoryList[rID]
+        navItem.title = repositoryList[rID].name
         
         let formatter = NumberFormatter()
         formatter.groupingSeparator = " "
         formatter.numberStyle = .decimal
-        watchCounter.text = "\(formatter.string(from: repo.value(forKey: "watchCount") as! NSNumber) ?? "error")"
-        starCounter.text = "\(formatter.string(from: repo.value(forKey: "starCount") as! NSNumber) ?? "error")"
-        forkCounter.text = "\(formatter.string(from: repo.value(forKey: "forkCount") as! NSNumber) ?? "error")"
+        watchCounter.text = "\(formatter.string(from: repo.watchCount as NSNumber) ?? "error")"
+        starCounter.text = "\(formatter.string(from: repo.starCount as NSNumber) ?? "error")"
+        forkCounter.text = "\(formatter.string(from: repo.forkCount as NSNumber) ?? "error")"
         
         //Расположение
         let horSpacing = (UIScreen.main.bounds.width - watchStack.frame.width - starStack.frame.width - forkStack.frame.width) / 4

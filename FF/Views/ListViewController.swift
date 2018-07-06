@@ -7,8 +7,8 @@
 //
 
 import UIKit
-import CoreData
 
+import RealmSwift
 import SwiftyJSON
 import NVActivityIndicatorView
 
@@ -30,10 +30,12 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     
     @objc func reloadRepos(_ sender: Any) {
         startAnimating()
-        for repo in repoList {
-            context.delete(repo)
+        try! realm.write {
+            for i in repositoryList {
+                realm.delete(i)
+            }
         }
-        repoList.removeAll()
+        repositoryList.removeAll()
         
         //Запрос 1 - получение списка репозиториев
         let repoURL = URL(string: "https://api.github.com/search/repositories?access_token=\(githubToken)&q=language:swift&sort=stars")!
@@ -44,14 +46,13 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
                 do {
                     let repoJSON = try JSON(data: repoData!)
                     for i in 0...29 {
-                        let entity = NSEntityDescription.entity(forEntityName: "Repo", in: context)!
-                        let tempRepo = NSManagedObject(entity: entity, insertInto: context)
                         
-                        tempRepo.setValue(repoJSON["items"][i]["name"].string!, forKey: "name")
-                        tempRepo.setValue(repoJSON["items"][i]["description"].string!, forKey: "desc")
-                        tempRepo.setValue(repoJSON["items"][i]["html_url"].string!, forKey: "url")
-                        tempRepo.setValue(repoJSON["items"][i]["stargazers_count"].int!, forKey: "starCount")
-                        tempRepo.setValue(repoJSON["items"][i]["forks_count"].int!, forKey: "forkCount")
+                        let tempRepo = Repository()
+                        tempRepo.name = repoJSON["items"][i]["name"].string!
+                        tempRepo.desc = repoJSON["items"][i]["description"].string!
+                        tempRepo.url = repoJSON["items"][i]["html_url"].string!
+                        tempRepo.starCount = repoJSON["items"][i]["stargazers_count"].int64!
+                        tempRepo.forkCount = repoJSON["items"][i]["forks_count"].int64!
                         
                         //Запрос 2 - получение кол-ва страниц watcher'ов
                         let watchURL = URL(string: "\(repoJSON["items"][i]["url"].string!)/subscribers?access_token=\(githubToken)&per_page=100")!
@@ -84,11 +85,17 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
                                                 
                                                 let totalCount = 100 * (Int(pageCount)! - 1) + lastPageCount
                                                 tempRepo.setValue(totalCount, forKey: "watchCount")
-                                                
-                                                try context.save()
+                                                let totalCount = Int64(100 * (Int(pageCount)! - 1) + lastPageCount)
+                                                tempRepo.watchCount = totalCount
                                                 
                                                 if i == 29 {
                                                     DispatchQueue.main.sync {
+                                                        for i in repositoryList {
+                                                            try! self.realm.write {
+                                                                self.realm.add(i)
+                                                            }
+                                                        }
+                                                        
                                                         self.tableView.reloadData()
                                                         self.stopAnimating()
                                                         self.refresher.endRefreshing()
@@ -106,7 +113,7 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
                         }.resume()
                         //Запрос 2 - конец
                         
-                        repoList.append(tempRepo)
+                        repositoryList.append(tempRepo)
                     }
                 } catch let error as NSError {
                     print("error while creating repo json")
@@ -114,28 +121,26 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
             }
         }.resume()
         //Запрос 1 - конец
-        
     }
     
     var sID: Int = 0
     var refresher = UIRefreshControl()
     
+    let realm = try! Realm()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let repoRequest = NSFetchRequest<NSManagedObject>(entityName: "Repo")
-        do {
-            repoList = try context.fetch(repoRequest)
-            repoList.sort(by: { ($0.value(forKey: "starCount") as! Int) > ($1.value(forKey: "starCount") as! Int) })
-        } catch let error as NSError {
-            print("Error while loading information from CoreData.\nError code: \(error.code)")
+        let realmFetch = realm.objects(Repository.self)
+        for i in realmFetch {
+            repositoryList.append(i)
         }
+        repositoryList.sort(by: { $0.starCount > $1.starCount })
         
         refresher.addTarget(self, action: #selector(reloadRepos(_:)), for: .valueChanged)
         self.tableView.refreshControl = refresher
         
         self.tableView.tableFooterView = UIView(frame: CGRect.zero)
-        //self.tableView.rowHeight = UITableViewAutomaticDimension
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -147,15 +152,15 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     
     //Методы UITableViewController
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if repoList.count == 0 {
+        if repositoryList.count == 0 {
             return 1
         } else {
-            return repoList.count
+            return repositoryList.count
         }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if repoList.count == 0 {
+        if repositoryList.count == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "emptyCell")!
 
             cell.selectionStyle = .none
@@ -166,7 +171,7 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
             let nameLbl = cell.viewWithTag(2) as! UILabel
             let descLbl = cell.viewWithTag(3) as! UILabel
             let starLbl = cell.viewWithTag(4) as! UILabel
-            let repo = repoList[indexPath.row]
+            let repo = repositoryList[indexPath.row]
 
             //Стиль
             logoImg.layer.cornerRadius = logoImg.frame.width / 2
@@ -174,27 +179,27 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
 
             //Содержание
             logoImg.image = UIImage(named: "swift_logo")
-            nameLbl.text = (repo.value(forKey: "name") as! String)
-            descLbl.text = (repo.value(forKey: "desc") as! String)
+            nameLbl.text = repo.name
+            descLbl.text = repo.desc
 
             let formatter = NumberFormatter()
             formatter.groupingSeparator = " "
             formatter.numberStyle = .decimal
-            starLbl.text = "★ \(formatter.string(from: repo.value(forKey: "starCount") as! NSNumber)!)"
+            starLbl.text = "★ \(formatter.string(from: (repo.starCount as NSNumber))!)"
 
             return cell
         }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if repoList.count != 0 {
+        if repositoryList.count != 0 {
             sID = indexPath.row
             self.performSegue(withIdentifier: "showDetails", sender: nil)
         }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if repoList.count != 0 {
+        if repositoryList.count != 0 {
             return UITableViewAutomaticDimension
         } else {
             return self.tableView.frame.height

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0CAF048B20EFAA29002D0904 /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF048A20EFAA29002D0904 /* Repository.swift */; };
 		0CD9BFEB20CAB24900E8410B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD9BFEA20CAB24900E8410B /* AppDelegate.swift */; };
 		0CD9BFF020CAB24900E8410B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0CD9BFEE20CAB24900E8410B /* Main.storyboard */; };
 		0CD9BFF320CAB24900E8410B /* FF.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0CD9BFF120CAB24900E8410B /* FF.xcdatamodeld */; };
@@ -15,11 +16,13 @@
 		0CD9C00120CAB91D00E8410B /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD9C00020CAB91D00E8410B /* ListViewController.swift */; };
 		0CD9C00320CAB92600E8410B /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD9C00220CAB92600E8410B /* DetailViewController.swift */; };
 		0CD9C00520CAB99E00E8410B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD9C00420CAB99E00E8410B /* Extensions.swift */; };
+		0CE9F21320EFA04500FD4B33 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE9F21220EFA04500FD4B33 /* APIManager.swift */; };
 		5BCFCBC514F7B05D049A31F4 /* Pods_FF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0802FCE3E43D4551A492F6B3 /* Pods_FF.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0802FCE3E43D4551A492F6B3 /* Pods_FF.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FF.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CAF048A20EFAA29002D0904 /* Repository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
 		0CD9BFE720CAB24900E8410B /* FF.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CD9BFEA20CAB24900E8410B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0CD9BFEF20CAB24900E8410B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -30,6 +33,7 @@
 		0CD9C00020CAB91D00E8410B /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		0CD9C00220CAB92600E8410B /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		0CD9C00420CAB99E00E8410B /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		0CE9F21220EFA04500FD4B33 /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
 		32903DB8ABDDD20D468DB2E6 /* Pods-FF.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FF.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FF/Pods-FF.debug.xcconfig"; sourceTree = "<group>"; };
 		3D9DB9F90BC456C7C8404100 /* Pods-FF.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FF.release.xcconfig"; path = "Pods/Target Support Files/Pods-FF/Pods-FF.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -77,7 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				0CD9BFEA20CAB24900E8410B /* AppDelegate.swift */,
-				0CD9C00420CAB99E00E8410B /* Extensions.swift */,
+				0CE9F21120EFA03500FD4B33 /* Helpers */,
 				0CD9BFFF20CAB91000E8410B /* Views */,
 				0CD9BFF420CAB24B00E8410B /* Assets.xcassets */,
 				0CD9BFEE20CAB24900E8410B /* Main.storyboard */,
@@ -95,6 +99,16 @@
 				0CD9C00220CAB92600E8410B /* DetailViewController.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		0CE9F21120EFA03500FD4B33 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				0CD9C00420CAB99E00E8410B /* Extensions.swift */,
+				0CAF048A20EFAA29002D0904 /* Repository.swift */,
+				0CE9F21220EFA04500FD4B33 /* APIManager.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		2BDB1FFE68E7F15676EDC98A /* Frameworks */ = {
@@ -117,7 +131,6 @@
 				0CD9BFE420CAB24900E8410B /* Frameworks */,
 				0CD9BFE520CAB24900E8410B /* Resources */,
 				75FE69594060F4F0583917A3 /* [CP] Embed Pods Frameworks */,
-				0CFFC50BF719F944C44E0766 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -175,21 +188,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0CFFC50BF719F944C44E0766 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FF/Pods-FF-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		6173F6C42EA9FC81ECE9F1D8 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -216,11 +214,15 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-FF/Pods-FF-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/NVActivityIndicatorView/NVActivityIndicatorView.framework",
+				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
+				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NVActivityIndicatorView.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -235,6 +237,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CAF048B20EFAA29002D0904 /* Repository.swift in Sources */,
+				0CE9F21320EFA04500FD4B33 /* APIManager.swift in Sources */,
 				0CD9BFEB20CAB24900E8410B /* AppDelegate.swift in Sources */,
 				0CD9BFF320CAB24900E8410B /* FF.xcdatamodeld in Sources */,
 				0CD9C00120CAB91D00E8410B /* ListViewController.swift in Sources */,

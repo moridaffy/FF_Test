@@ -8,9 +8,8 @@
 
 import UIKit
 import Foundation
-import CoreData
 
-var repoList: [NSManagedObject] = []
+var repositoryList: [Repository] = []
 
 let githubToken: String = "e1824194bdad8cb6082ba53d9f54e2ebc6950377"
 
