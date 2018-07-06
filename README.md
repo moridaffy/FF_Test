@@ -11,8 +11,8 @@
 </h1>
 
 <p align="center">
-  <a href="#Информация">Информация</a> • 
-  <a href="#Как-запустить">Как запустить</a> • 
+  <a href="#Информация">Информация</a> •
+  <a href="#Как-запустить">Как запустить</a> •
   <a href="#Разработчик">Разработчик</a>
 </p>
 
@@ -22,11 +22,10 @@
 * Приложение написано на Swift'e
 * Верстка экранов соответствует предоставленному макету в Sketch
 * Интерфейсы построены в IB с использованием AutoLayout'a
-* Приложение использует 2 сторонних фреймворка: <a href="https://github.com/SwiftyJSON/SwiftyJSON">SwiftyJSON</a> и <a href="https://github.com/ninjaprox/NVActivityIndicatorView">NVActivityIndicatorView</a>
-* Используется архитектура MVC
+* Приложение использует 3 сторонних фреймворка: <a href="https://github.com/SwiftyJSON/SwiftyJSON">SwiftyJSON</a>, <a href="https://github.com/ninjaprox/NVActivityIndicatorView">NVActivityIndicatorView</a> и <a href="https://github.com/realm/realm-cocoa">Realm</a>
 * Список обновляется при помощи жеста "pull to refresh"
 * Соблюдены требования по поддерживаемой версии iOS, поддерживаемым устройствам и ориентации
-* Загруженные данные сохраняются в CoreData, что позволяет просматривать их при последующем запуске приложения при отсутствии подключения к интернету
+* Загруженные данные сохраняются в локальный Realm, что позволяет просматривать их при последующем запуске приложения при отсутствии подключения к интернету
 
 
 ## Как запустить
