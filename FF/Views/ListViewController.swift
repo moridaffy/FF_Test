@@ -83,8 +83,6 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
                                                 let lastPageJSON = try JSON(data: lastPageData!)
                                                 let lastPageCount = lastPageJSON.count
                                                 
-                                                let totalCount = 100 * (Int(pageCount)! - 1) + lastPageCount
-                                                tempRepo.setValue(totalCount, forKey: "watchCount")
                                                 let totalCount = Int64(100 * (Int(pageCount)! - 1) + lastPageCount)
                                                 tempRepo.watchCount = totalCount
                                                 
