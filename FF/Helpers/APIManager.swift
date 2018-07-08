@@ -120,12 +120,14 @@ class APIManager {
         var repoList: [Repository] = []
         
         if db {
+            print("🔥 Loading repos from Realm")
             let realmFetch = realm.objects(Repository.self)
             for i in realmFetch {
                 repoList.append(i)
             }
             completionHandler(true, repoList, nil)
         } else {
+            print("🔥 Loading repos from GitHub API")
             loadData(token: token) { (status_loadData, data_loadData, error_loadData) in
                 if !status_loadData {
                     //Ошибка при загрузке JSON'a
@@ -149,6 +151,8 @@ class APIManager {
                                     
                                     DispatchQueue.main.sync {
                                         try! realm.write {
+                                            print("🔥 Writing to Realm")
+                                            realm.deleteAll()
                                             for i in repoList {
                                                 realm.add(i)
                                             }
