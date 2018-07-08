@@ -84,28 +84,7 @@ class ListViewController: UITableViewController {
             cell.selectionStyle = .none
             return cell
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "repoCell")!
-            let logoImg = cell.viewWithTag(1) as! UIImageView
-            let nameLbl = cell.viewWithTag(2) as! UILabel
-            let descLbl = cell.viewWithTag(3) as! UILabel
-            let starLbl = cell.viewWithTag(4) as! UILabel
-            let repo = repoList[indexPath.row]
-
-            //Стиль
-            logoImg.layer.cornerRadius = logoImg.frame.width / 2
-            logoImg.layer.masksToBounds = true
-
-            //Содержание
-            logoImg.image = UIImage(named: "swift_logo")
-            nameLbl.text = repo.name
-            descLbl.text = repo.desc
-
-            let formatter = NumberFormatter()
-            formatter.groupingSeparator = " "
-            formatter.numberStyle = .decimal
-            starLbl.text = "★ \(formatter.string(from: (repo.starCount as NSNumber))!)"
-
-            return cell
+            return RepositoryCell.presentRepo(repo: repoList[indexPath.row])
         }
     }
     
