@@ -8,5 +8,4 @@ target 'FF' do
   # Pods for FF
 pod 'SwiftyJSON'
 pod 'RealmSwift'
-pod 'NVActivityIndicatorView'
 end

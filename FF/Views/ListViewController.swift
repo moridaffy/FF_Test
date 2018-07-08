@@ -8,11 +8,7 @@
 
 import UIKit
 
-import RealmSwift
-import SwiftyJSON
-import NVActivityIndicatorView
-
-class ListViewController: UITableViewController, NVActivityIndicatorViewable {
+class ListViewController: UITableViewController {
     
     @IBAction func aboutBtn(_ sender: Any) {
         let alert = UIAlertController(title: "О приложении", message: "Приложение является выполненным тестовым заданием для кандидатов на позицию iOS Junior Developer в компании Family Friend.\n\nРазработчик: Максим Скрябин.", preferredStyle: .alert)

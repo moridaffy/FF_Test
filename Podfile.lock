@@ -1,7 +1,4 @@
 PODS:
-  - NVActivityIndicatorView (4.1.1):
-    - NVActivityIndicatorView/Presenter (= 4.1.1)
-  - NVActivityIndicatorView/Presenter (4.1.1)
   - Realm (3.7.4):
     - Realm/Headers (= 3.7.4)
   - Realm/Headers (3.7.4)
@@ -10,23 +7,20 @@ PODS:
   - SwiftyJSON (4.0.0)
 
 DEPENDENCIES:
-  - NVActivityIndicatorView
   - RealmSwift
   - SwiftyJSON
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - NVActivityIndicatorView
     - Realm
     - RealmSwift
     - SwiftyJSON
 
 SPEC CHECKSUMS:
-  NVActivityIndicatorView: 60109b9bf46efc2e71ab81453196ccdfdfeea870
   Realm: a469bb59e33f9926102ccaea4349822c53b9117e
   RealmSwift: a45861b21c180f5cf0f122144b9759fa8dde3e9e
   SwiftyJSON: 070dabdcb1beb81b247c65ffa3a79dbbfb3b48aa
 
-PODFILE CHECKSUM: 83fa08625b31d5ce8f9dacc835c69c69b5a64733
+PODFILE CHECKSUM: 718beb7c7904aa9078d4936261281dbfb9042f19
 
 COCOAPODS: 1.5.3
