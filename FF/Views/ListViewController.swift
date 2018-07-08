@@ -79,10 +79,7 @@ class ListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if repoList.count == 0 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "emptyCell")!
-
-            cell.selectionStyle = .none
-            return cell
+            return EmptyCell.presentEmpty()
         } else {
             return RepositoryCell.presentRepo(repo: repoList[indexPath.row])
         }
