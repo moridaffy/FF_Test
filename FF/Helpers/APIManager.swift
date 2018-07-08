@@ -8,10 +8,11 @@
 
 import Foundation
 import SwiftyJSON
+import RealmSwift
 
 class APIManager {
     //Загрузка JSON'a с репозиториями
-    private func loadData(token: String, completionHandler: @escaping (Bool, Data?, Error?) -> Void) {
+    private class func loadData(token: String, completionHandler: @escaping (Bool, Data?, Error?) -> Void) {
         let url = URL(string: "https://api.github.com/search/repositories?access_token=\(token)&q=language:swift&sort=stars")!
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             if data == nil || error != nil {
@@ -29,7 +30,7 @@ class APIManager {
     }
     
     //Парс информации из полученного JSON'a
-    private func parseRepos(data: Data, count: Int, completionHandler: (Bool, [Repository]?, Error?) -> Void) {
+    private class func parseRepos(data: Data, count: Int, completionHandler: (Bool, [Repository]?, Error?) -> Void) {
         do {
             let repoJSON = try JSON(data: data)
             var tempArr: [Repository] = []
@@ -53,7 +54,7 @@ class APIManager {
     }
     
     //Получение кол-ва watcher'ов
-    private func loadWatchers(token: String, repos: [Repository], completionHandler: @escaping (Bool, [Repository]?, Error?) -> Void) {
+    private class func loadWatchers(token: String, repos: [Repository], completionHandler: @escaping (Bool, [Repository]?, Error?) -> Void) {
         for i in 0...repos.count-1{
             let pagesURL = URL(string: "\(repos[i].api_url)/subscribers?access_token=\(token)&per_page=100")!
             URLSession.shared.dataTask(with: pagesURL) { (data, response, error) in
@@ -109,18 +110,56 @@ class APIManager {
                         }.resume()
                     }
                 }
-            }
+            }.resume()
         }
     }
     
     //Загрузка и обработка всей необходимой информации
-    func loadRepos(count: Int, token: String, completionHandler: (Bool, [Repository]?, Error?) -> Void) {
-        loadData(token: token) { (repoSuccess, repoData, repoError) in
-            if !repoSuccess {
-                completionHandler(false, nil, repoError)
-            } else {
-                parseRepos(data: repoData!, count: count) { (parseSuccess, parseData, parseError) in
-                    
+    class func loadRepos(db: Bool, count: Int, token: String, completionHandler: @escaping (Bool, [Repository]?, Error?) -> Void) {
+        let realm = try! Realm()
+        var repoList: [Repository] = []
+        
+        if db {
+            let realmFetch = realm.objects(Repository.self)
+            for i in realmFetch {
+                repoList.append(i)
+            }
+            completionHandler(true, repoList, nil)
+        } else {
+            loadData(token: token) { (status_loadData, data_loadData, error_loadData) in
+                if !status_loadData {
+                    //Ошибка при загрузке JSON'a
+                    completionHandler(false, nil, error_loadData)
+                } else {
+                    //JSON загружен успешно
+                    self.parseRepos(data: data_loadData!, count: count) { (status_parse, data_parse, error_parse) in
+                        if !status_parse {
+                            //Ошибка при извлечении информации из JSON'a
+                            completionHandler(false, nil, error_parse)
+                        } else {
+                            //Извлечение информации из JSON'a прошло успешно
+                            self.loadWatchers(token: token, repos: data_parse!) { (status_loadWatchers, data_loadWatchers, error_loadWatchers) in
+                                if !status_loadWatchers {
+                                    //Ошибка при загрузке кол-ва Watcher'ов
+                                    completionHandler(false, nil, error_loadWatchers)
+                                } else {
+                                    //Кол-во Watcher'ов загружено успешно
+                                    repoList = data_loadWatchers!
+                                    repoList.sort(by: { $0.starCount > $1.starCount })
+                                    
+                                    DispatchQueue.main.sync {
+                                        try! realm.write {
+                                            for i in repoList {
+                                                realm.add(i)
+                                            }
+                                        }
+                                    }
+                                    
+                                    completionHandler(true, repoList, nil)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

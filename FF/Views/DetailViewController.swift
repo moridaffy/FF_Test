@@ -23,11 +23,11 @@ class DetailViewController: UIViewController {
     
     @IBOutlet weak var webBtnOut: UIButton!
     @IBAction func webBtn(_ sender: Any) {
-        let url = URL(string: repositoryList[rID].url)!
+        let url = URL(string: repo.url)!
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
     
-    var rID: Int = -1
+    var repo: Repository = Repository()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,8 +37,7 @@ class DetailViewController: UIViewController {
         webBtnOut.layer.masksToBounds = true
         
         //Содержание
-        let repo = repositoryList[rID]
-        navItem.title = repositoryList[rID].name
+        navItem.title = repo.name
         
         let formatter = NumberFormatter()
         formatter.groupingSeparator = " "

@@ -29,23 +29,35 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     }
     
     @objc func reloadRepos(_ sender: Any) {
-        self.tableView.reloadData()
-        self.refresher.endRefreshing()
+        APIManager.loadRepos(db: false, count: 30, token: githubToken) { (status, repos, error) in
+            DispatchQueue.main.sync {
+                if !status {
+                    let alert = UIAlertController(title: "Ошибка!", message: "Произошла ошибка при загрузке данных.\n\nОшибка: \(error.debugDescription)", preferredStyle: .alert)
+                    let ok = UIAlertAction(title: "Ок", style: .default, handler: { _ in
+                        alert.dismiss(animated: true, completion: nil)
+                    })
+                    alert.addAction(ok)
+                    self.present(alert, animated: true, completion: nil)
+                } else {
+                    self.repoList = repos!
+                }
+                
+                self.tableView.reloadData()
+                self.refresher.endRefreshing()
+            }
+        }
     }
     
     var sID: Int = 0
     var refresher = UIRefreshControl()
-    
-    let realm = try! Realm()
+    var repoList: [Repository] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let realmFetch = realm.objects(Repository.self)
-        for i in realmFetch {
-            repositoryList.append(i)
+        APIManager.loadRepos(db: true, count: 30, token: githubToken) { (status, data, error) in
+            self.repoList = data!
         }
-        repositoryList.sort(by: { $0.starCount > $1.starCount })
         
         refresher.addTarget(self, action: #selector(reloadRepos(_:)), for: .valueChanged)
         self.tableView.refreshControl = refresher
@@ -56,21 +68,21 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetails" {
             let destVC = segue.destination as! DetailViewController
-            destVC.rID = sID
+            destVC.repo = repoList[sID]
         }
     }
     
     //Методы UITableViewController
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if repositoryList.count == 0 {
+        if repoList.count == 0 {
             return 1
         } else {
-            return repositoryList.count
+            return repoList.count
         }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if repositoryList.count == 0 {
+        if repoList.count == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "emptyCell")!
 
             cell.selectionStyle = .none
@@ -81,7 +93,7 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
             let nameLbl = cell.viewWithTag(2) as! UILabel
             let descLbl = cell.viewWithTag(3) as! UILabel
             let starLbl = cell.viewWithTag(4) as! UILabel
-            let repo = repositoryList[indexPath.row]
+            let repo = repoList[indexPath.row]
 
             //Стиль
             logoImg.layer.cornerRadius = logoImg.frame.width / 2
@@ -102,14 +114,14 @@ class ListViewController: UITableViewController, NVActivityIndicatorViewable {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if repositoryList.count != 0 {
+        if repoList.count != 0 {
             sID = indexPath.row
             self.performSegue(withIdentifier: "showDetails", sender: nil)
         }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if repositoryList.count != 0 {
+        if repoList.count != 0 {
             return UITableViewAutomaticDimension
         } else {
             return self.tableView.frame.height
