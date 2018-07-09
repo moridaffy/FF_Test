@@ -41,8 +41,8 @@ class APIManager {
                 tempRepo.desc = repoJSON["items"][i]["description"].string!
                 tempRepo.url = repoJSON["items"][i]["html_url"].string!
                 tempRepo.api_url = repoJSON["items"][i]["url"].string!
-                tempRepo.starCount = repoJSON["items"][i]["stargazers_count"].int64!
-                tempRepo.forkCount = repoJSON["items"][i]["forks_count"].int64!
+                tempRepo.starCount = repoJSON["items"][i]["stargazers_count"].int!
+                tempRepo.forkCount = repoJSON["items"][i]["forks_count"].int!
                 tempRepo.watchCount = 0
                 tempArr.append(tempRepo)
             }
@@ -97,7 +97,7 @@ class APIManager {
                                 do {
                                     let lastPageJSON = try JSON(data: data!)
                                     let lastPageCount = lastPageJSON.count
-                                    repos[i].watchCount = Int64(100 * (Int(pageCount)! - 1) + lastPageCount)
+                                    repos[i].watchCount = 100 * (Int(pageCount)! - 1) + lastPageCount
                                     
                                     if i == repos.count-1 {
                                         completionHandler(true, repos, nil)

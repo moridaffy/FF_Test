@@ -14,7 +14,7 @@ class Repository: Object {
     @objc dynamic var desc: String = ""
     @objc dynamic var url: String = ""
     @objc dynamic var api_url: String = ""
-    @objc dynamic var watchCount: Int64 = -1
-    @objc dynamic var starCount: Int64 = -1
-    @objc dynamic var forkCount: Int64 = -1
+    @objc dynamic var watchCount: Int = 0
+    @objc dynamic var starCount: Int = 0
+    @objc dynamic var forkCount: Int = 0
 }
