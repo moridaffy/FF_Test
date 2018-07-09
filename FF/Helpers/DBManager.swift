@@ -28,19 +28,24 @@ class DBManager {
     }
     
     class func writoToDB(data: [Repository], completionHandler: @escaping (Bool, Error?) -> Void) {
-        do {
-            DispatchQueue.main.sync {
-                let realm = try! Realm()
-                try! realm.write {
+        var err: NSError?
+        DispatchQueue.main.sync {
+            do {
+                let realm = try Realm()
+                try realm.write {
                     realm.deleteAll()
                     for i in data {
                         realm.add(i)
                     }
                 }
+            } catch let error as NSError {
+                err = NSError(domain: "Error while writing data to DB. Error: \(error.debugDescription)", code: 5, userInfo: nil)
             }
+        }
+        
+        if err == nil {
             completionHandler(true, nil)
-        } catch let error as NSError {
-            let err = NSError(domain: "Error while writing data to DB. Error: \(error.debugDescription)", code: 5, userInfo: nil)
+        } else {
             completionHandler(false, err)
         }
     }
