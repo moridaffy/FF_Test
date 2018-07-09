@@ -8,7 +8,6 @@
 
 import Foundation
 import SwiftyJSON
-import RealmSwift
 
 class APIManager {
     //Загрузка JSON'a с репозиториями
@@ -115,51 +114,36 @@ class APIManager {
     }
     
     //Загрузка и обработка всей необходимой информации
-    class func loadRepos(db: Bool, count: Int, token: String, completionHandler: @escaping (Bool, [Repository]?, Error?) -> Void) {
-        let realm = try! Realm()
+    class func loadRepos(count: Int, token: String, completionHandler: @escaping (Bool, [Repository]?, Error?) -> Void) {
         var repoList: [Repository] = []
-        
-        if db {
-            print("🔥 Loading repos from Realm")
-            let realmFetch = realm.objects(Repository.self)
-            for i in realmFetch {
-                repoList.append(i)
-            }
-            completionHandler(true, repoList, nil)
-        } else {
-            print("🔥 Loading repos from GitHub API")
-            loadData(token: token) { (status_loadData, data_loadData, error_loadData) in
-                if !status_loadData {
-                    //Ошибка при загрузке JSON'a
-                    completionHandler(false, nil, error_loadData)
-                } else {
-                    //JSON загружен успешно
-                    self.parseRepos(data: data_loadData!, count: count) { (status_parse, data_parse, error_parse) in
-                        if !status_parse {
-                            //Ошибка при извлечении информации из JSON'a
-                            completionHandler(false, nil, error_parse)
-                        } else {
-                            //Извлечение информации из JSON'a прошло успешно
-                            self.loadWatchers(token: token, repos: data_parse!) { (status_loadWatchers, data_loadWatchers, error_loadWatchers) in
-                                if !status_loadWatchers {
-                                    //Ошибка при загрузке кол-ва Watcher'ов
-                                    completionHandler(false, nil, error_loadWatchers)
-                                } else {
-                                    //Кол-во Watcher'ов загружено успешно
-                                    repoList = data_loadWatchers!
-                                    repoList.sort(by: { $0.starCount > $1.starCount })
-                                    
-                                    DispatchQueue.main.sync {
-                                        try! realm.write {
-                                            print("🔥 Writing to Realm")
-                                            realm.deleteAll()
-                                            for i in repoList {
-                                                realm.add(i)
-                                            }
-                                        }
+        print("🔥 Loading repos from GitHub API")
+        loadData(token: token) { (status_loadData, data_loadData, error_loadData) in
+            if !status_loadData {
+                //Ошибка при загрузке JSON'a
+                completionHandler(false, nil, error_loadData)
+            } else {
+                //JSON загружен успешно
+                self.parseRepos(data: data_loadData!, count: count) { (status_parse, data_parse, error_parse) in
+                    if !status_parse {
+                        //Ошибка при извлечении информации из JSON'a
+                        completionHandler(false, nil, error_parse)
+                    } else {
+                        //Извлечение информации из JSON'a прошло успешно
+                        self.loadWatchers(token: token, repos: data_parse!) { (status_loadWatchers, data_loadWatchers, error_loadWatchers) in
+                            if !status_loadWatchers {
+                                //Ошибка при загрузке кол-ва Watcher'ов
+                                completionHandler(false, nil, error_loadWatchers)
+                            } else {
+                                //Кол-во Watcher'ов загружено успешно
+                                repoList = data_loadWatchers!
+                                repoList.sort(by: { $0.starCount > $1.starCount })
+                                
+                                DBManager.writoToDB(data: repoList) { (success_write, error_write) in
+                                    if success_write {
+                                        completionHandler(true, repoList, nil)
+                                    } else {
+                                        completionHandler(false, nil, error_write)
                                     }
-                                    
-                                    completionHandler(true, repoList, nil)
                                 }
                             }
                         }

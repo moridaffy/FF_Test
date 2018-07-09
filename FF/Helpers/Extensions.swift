@@ -23,3 +23,14 @@ extension String {
         }
     }
 }
+
+extension UIViewController {
+    func showAlert(title: String, body: String, btn: String) {
+        let alert = UIAlertController(title: title, message: body, preferredStyle: .alert)
+        let ok = UIAlertAction(title: btn, style: .default, handler: { _ in
+            alert.dismiss(animated: true, completion: nil)
+        })
+        alert.addAction(ok)
+        self.present(alert, animated: true, completion: nil)
+    }
+}

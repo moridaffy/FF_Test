@@ -25,15 +25,10 @@ class ListViewController: UITableViewController {
     }
     
     @objc func reloadRepos(_ sender: Any) {
-        APIManager.loadRepos(db: false, count: 30, token: githubToken) { (status, repos, error) in
-            DispatchQueue.main.sync {
+        APIManager.loadRepos(count: 30, token: githubToken) { (status, repos, error) in
+            DispatchQueue.main.async {
                 if !status {
-                    let alert = UIAlertController(title: "Ошибка!", message: "Произошла ошибка при загрузке данных.\n\nОшибка: \(error.debugDescription)", preferredStyle: .alert)
-                    let ok = UIAlertAction(title: "Ок", style: .default, handler: { _ in
-                        alert.dismiss(animated: true, completion: nil)
-                    })
-                    alert.addAction(ok)
-                    self.present(alert, animated: true, completion: nil)
+                    self.showAlert(title: "Ошибка!", body: "Произошла ошибка при загрузке данных.\n\nОшибка: \(error.debugDescription)", btn: "Ок")
                 } else {
                     self.repoList = repos!
                 }
@@ -51,8 +46,15 @@ class ListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        APIManager.loadRepos(db: true, count: 30, token: githubToken) { (status, data, error) in
-            self.repoList = data!
+        DBManager.readFromDB() { (success, data, error) in
+            DispatchQueue.main.async {
+                if success {
+                    self.repoList = data!
+                    self.tableView.reloadData()
+                } else {
+                    self.showAlert(title: "Ошибка!", body: "Произошла ошибка при загрузке данных.\n\nОшибка: \(error.debugDescription)", btn: "Ок")
+                }
+            }
         }
         
         refresher.addTarget(self, action: #selector(reloadRepos(_:)), for: .valueChanged)
