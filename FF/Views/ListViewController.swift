@@ -58,6 +58,7 @@ class ListViewController: UITableViewController {
         refresher.addTarget(self, action: #selector(reloadRepos(_:)), for: .valueChanged)
         self.tableView.refreshControl = refresher
         
+        self.tableView.register(UINib(nibName: "RepositoryCell", bundle: Bundle.main), forCellReuseIdentifier: "repositoryCell")
         self.tableView.tableFooterView = UIView(frame: CGRect.zero)
     }
     
@@ -70,19 +71,46 @@ class ListViewController: UITableViewController {
     
     //Методы UITableViewController
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return repoList.count
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         if repoList.count == 0 {
-            return 1
+            return 100
         } else {
-            return repoList.count
+            return 0
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if repoList.count == 0 {
+            let headerLbl = UILabel()
+            headerLbl.text = "Потяните экран вниз, чтобы загрузить список репозиториев."
+            headerLbl.numberOfLines = 0
+            headerLbl.textAlignment = .center
+            headerLbl.font = UIFont(name: "HelveticaNeue", size: 16)
+            return headerLbl
+        } else {
+            return nil
         }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if repoList.count == 0 {
-            return EmptyCell.presentEmpty()
-        } else {
-            return RepositoryCell.presentRepo(repo: repoList[indexPath.row])
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "repositoryCell") as! RepositoryCell
+        let repo = repoList[indexPath.row]
+        
+        cell.swiftImage.layer.cornerRadius = cell.swiftImage.frame.width / 2
+        cell.swiftImage.layer.masksToBounds = true
+        cell.swiftImage.image = UIImage(named: "swift_logo")
+        cell.nameLbl.text = repo.name
+        cell.descLbl.text = repo.desc
+        
+        let formatter = NumberFormatter()
+        formatter.groupingSeparator = " "
+        formatter.numberStyle = .decimal
+        cell.starLbl.text = "★ \(formatter.string(from: (repo.starCount as NSNumber))!)"
+        
+        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
