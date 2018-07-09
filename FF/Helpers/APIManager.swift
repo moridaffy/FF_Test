@@ -114,25 +114,25 @@ class APIManager {
     }
     
     //Загрузка и обработка всей необходимой информации
-    class func loadRepos(count: Int, token: String, completionHandler: @escaping (Bool, [Repository]?, Error?) -> Void) {
+    class func loadRepos(count: Int, token: String, completionHandler: @escaping (Bool, Error?) -> Void) {
         var repoList: [Repository] = []
         print("🔥 Loading repos from GitHub API")
         loadData(token: token) { (status_loadData, data_loadData, error_loadData) in
             if !status_loadData {
                 //Ошибка при загрузке JSON'a
-                completionHandler(false, nil, error_loadData)
+                completionHandler(false, error_loadData)
             } else {
                 //JSON загружен успешно
                 self.parseRepos(data: data_loadData!, count: count) { (status_parse, data_parse, error_parse) in
                     if !status_parse {
                         //Ошибка при извлечении информации из JSON'a
-                        completionHandler(false, nil, error_parse)
+                        completionHandler(false, error_parse)
                     } else {
                         //Извлечение информации из JSON'a прошло успешно
                         self.loadWatchers(token: token, repos: data_parse!) { (status_loadWatchers, data_loadWatchers, error_loadWatchers) in
                             if !status_loadWatchers {
                                 //Ошибка при загрузке кол-ва Watcher'ов
-                                completionHandler(false, nil, error_loadWatchers)
+                                completionHandler(false, error_loadWatchers)
                             } else {
                                 //Кол-во Watcher'ов загружено успешно
                                 repoList = data_loadWatchers!
@@ -140,9 +140,9 @@ class APIManager {
                                 
                                 DBManager.writoToDB(data: repoList) { (success_write, error_write) in
                                     if success_write {
-                                        completionHandler(true, repoList, nil)
+                                        completionHandler(true, nil)
                                     } else {
-                                        completionHandler(false, nil, error_write)
+                                        completionHandler(false, error_write)
                                     }
                                 }
                             }

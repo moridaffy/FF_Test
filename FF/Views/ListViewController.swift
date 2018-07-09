@@ -8,6 +8,8 @@
 
 import UIKit
 
+import RealmSwift
+
 class ListViewController: UITableViewController {
     
     @IBAction func aboutBtn(_ sender: Any) {
@@ -25,15 +27,12 @@ class ListViewController: UITableViewController {
     }
     
     @objc func reloadRepos(_ sender: Any) {
-        APIManager.loadRepos(count: 30, token: githubToken) { (status, repos, error) in
+        APIManager.loadRepos(count: 30, token: githubToken) { (status, error) in
             DispatchQueue.main.async {
                 if !status {
                     self.showAlert(title: "Ошибка!", body: "Произошла ошибка при загрузке данных.\n\nОшибка: \(error.debugDescription)", btn: "Ок")
-                } else {
-                    self.repoList = repos!
                 }
                 
-                self.tableView.reloadData()
                 self.refresher.endRefreshing()
             }
         }
@@ -43,23 +42,39 @@ class ListViewController: UITableViewController {
     var refresher = UIRefreshControl()
     var repoList: [Repository] = []
     
+    var notificationToken: NotificationToken? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        DBManager.readFromDB() { (success, data, error) in
-            DispatchQueue.main.async {
-                if success {
-                    self.repoList = data!
-                    self.tableView.reloadData()
-                } else {
-                    self.showAlert(title: "Ошибка!", body: "Произошла ошибка при загрузке данных.\n\nОшибка: \(error.debugDescription)", btn: "Ок")
+        let realm = try! Realm()
+        let repos = realm.objects(Repository.self)
+        
+        notificationToken = repos.observe { [weak self] (changes: RealmCollectionChange) in
+            let tableView: UITableView = (self?.tableView)!
+            switch changes {
+            case .initial:
+                self!.repoList.removeAll()
+                for i in repos {
+                    self!.repoList.append(i)
                 }
+                tableView.reloadData()
+            case .update:
+                print("🔥 .update \(Thread.current)")
+                self!.repoList.removeAll()
+                for i in repos {
+                    self!.repoList.append(i)
+                }
+                tableView.reloadData()
+            case .error(let error):
+                print("🔥 .error")
+                // An error occurred while opening the Realm file on the background worker thread
+                fatalError("\(error)")
             }
         }
         
         refresher.addTarget(self, action: #selector(reloadRepos(_:)), for: .valueChanged)
         self.tableView.refreshControl = refresher
-        
         self.tableView.register(UINib(nibName: "RepositoryCell", bundle: Bundle.main), forCellReuseIdentifier: "repositoryCell")
         self.tableView.tableFooterView = UIView(frame: CGRect.zero)
     }

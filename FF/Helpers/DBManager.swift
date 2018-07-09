@@ -12,7 +12,7 @@ import RealmSwift
 
 class DBManager {
     
-    class func readFromDB(completionHandler: (Bool, [Repository]?, Error?) -> Void) {
+    class func readFromDB(completionHandler: (Bool, Error?) -> Void) {
         do {
             var repoList: [Repository] = []
             let realm = try Realm()
@@ -20,10 +20,10 @@ class DBManager {
             for i in realmFetch {
                 repoList.append(i)
             }
-            completionHandler(true, repoList, nil)
+            completionHandler(true, nil)
         } catch let error as NSError {
             let err = NSError(domain: "Error while reading data from DB. Error: \(error.debugDescription)", code: 5, userInfo: nil)
-            completionHandler(false, nil, err)
+            completionHandler(false, err)
         }
     }
     
@@ -31,6 +31,7 @@ class DBManager {
         var err: NSError?
         DispatchQueue.main.sync {
             do {
+                print("🔥 Writing to DB from thread: \(Thread.current)")
                 let realm = try Realm()
                 try realm.write {
                     realm.deleteAll()
@@ -38,6 +39,7 @@ class DBManager {
                         realm.add(i)
                     }
                 }
+                print("🔥 Done writing to DB from thread: \(Thread.current)")
             } catch let error as NSError {
                 err = NSError(domain: "Error while writing data to DB. Error: \(error.debugDescription)", code: 5, userInfo: nil)
             }
