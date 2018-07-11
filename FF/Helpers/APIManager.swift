@@ -115,7 +115,6 @@ class APIManager {
     
     //Загрузка и обработка всей необходимой информации
     class func loadRepos(count: Int, token: String, completionHandler: @escaping (Bool, Error?) -> Void) {
-        var repoList: [Repository] = []
         print("🔥 Loading repos from GitHub API")
         loadData(token: token) { (status_loadData, data_loadData, error_loadData) in
             if !status_loadData {
@@ -135,10 +134,7 @@ class APIManager {
                                 completionHandler(false, error_loadWatchers)
                             } else {
                                 //Кол-во Watcher'ов загружено успешно
-                                repoList = data_loadWatchers!
-                                repoList.sort(by: { $0.starCount > $1.starCount })
-                                
-                                DBManager.writoToDB(data: repoList) { (success_write, error_write) in
+                                DBManager.writoToDB(data: data_loadWatchers!) { (success_write, error_write) in
                                     if success_write {
                                         completionHandler(true, nil)
                                     } else {

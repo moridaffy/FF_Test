@@ -45,15 +45,6 @@ class DetailViewController: UIViewController {
         watchCounter.text = "\(formatter.string(from: repo.watchCount as NSNumber) ?? "error")"
         starCounter.text = "\(formatter.string(from: repo.starCount as NSNumber) ?? "error")"
         forkCounter.text = "\(formatter.string(from: repo.forkCount as NSNumber) ?? "error")"
-        
-        //Расположение
-        let horSpacing = (UIScreen.main.bounds.width - watchStack.frame.width - starStack.frame.width - forkStack.frame.width) / 4
-        let verSpacing = ((self.view.frame.height / 2) - webBtnOut.frame.height - counterStack.frame.height) / 3
-        
-        infoStack.frame.size.width = UIScreen.main.bounds.width - horSpacing * 2
-        infoStack.frame.size.height = (self.view.frame.height / 2) - verSpacing * 2
-        infoStack.frame.origin.x = horSpacing
-        infoStack.frame.origin.y = self.navigationController!.navigationBar.frame.maxY + verSpacing
     }
     
 }

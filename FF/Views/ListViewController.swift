@@ -40,7 +40,7 @@ class ListViewController: UITableViewController {
     
     var sID: Int = 0
     var refresher = UIRefreshControl()
-    var repoList: [Repository] = []
+    var repoList: Results<Repository>!
     
     var notificationToken: NotificationToken? = nil
     
@@ -48,28 +48,14 @@ class ListViewController: UITableViewController {
         super.viewDidLoad()
         
         let realm = try! Realm()
-        let repos = realm.objects(Repository.self)
+        repoList = realm.objects(Repository.self).sorted(byKeyPath: "starCount", ascending: false)
         
-        notificationToken = repos.observe { [weak self] (changes: RealmCollectionChange) in
-            let tableView: UITableView = (self?.tableView)!
+        notificationToken = repoList.observe { [weak self] (changes: RealmCollectionChange) in
             switch changes {
-            case .initial:
-                self!.repoList.removeAll()
-                for i in repos {
-                    self!.repoList.append(i)
-                }
-                tableView.reloadData()
-            case .update:
-                print("🔥 .update \(Thread.current)")
-                self!.repoList.removeAll()
-                for i in repos {
-                    self!.repoList.append(i)
-                }
-                tableView.reloadData()
             case .error(let error):
-                print("🔥 .error")
-                // An error occurred while opening the Realm file on the background worker thread
                 fatalError("\(error)")
+            default:
+                self?.tableView.reloadData()
             }
         }
         
@@ -77,6 +63,10 @@ class ListViewController: UITableViewController {
         self.tableView.refreshControl = refresher
         self.tableView.register(UINib(nibName: "RepositoryCell", bundle: Bundle.main), forCellReuseIdentifier: "repositoryCell")
         self.tableView.tableFooterView = UIView(frame: CGRect.zero)
+    }
+    
+    deinit {
+        notificationToken?.invalidate()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
