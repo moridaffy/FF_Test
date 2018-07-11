@@ -38,7 +38,6 @@ class ListViewController: UITableViewController {
         }
     }
     
-    var sID: Int = 0
     var refresher = UIRefreshControl()
     var repoList: Results<Repository>!
     
@@ -67,13 +66,6 @@ class ListViewController: UITableViewController {
     
     deinit {
         notificationToken?.invalidate()
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showDetails" {
-            let destVC = segue.destination as! DetailViewController
-            destVC.repo = repoList[sID]
-        }
     }
     
     //Методы UITableViewController
@@ -122,8 +114,10 @@ class ListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if repoList.count != 0 {
-            sID = indexPath.row
-            self.performSegue(withIdentifier: "showDetails", sender: nil)
+            let sb = UIStoryboard.init(name: "Main", bundle: Bundle.main)
+            let destVC = sb.instantiateViewController(withIdentifier: "detailVC") as! DetailViewController
+            destVC.repo = repoList[indexPath.row]
+            self.navigationController?.pushViewController(destVC, animated: true)
         }
     }
     

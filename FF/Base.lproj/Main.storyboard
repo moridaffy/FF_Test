@@ -15,7 +15,7 @@
         <!--Репозитории-->
         <scene sceneID="3cO-CJ-nRw">
             <objects>
-                <tableViewController id="M4R-VV-FWJ" customClass="ListViewController" customModule="FF" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="listVC" id="M4R-VV-FWJ" customClass="ListViewController" customModule="FF" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="jdi-xV-FKK">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -57,9 +57,6 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <connections>
-                        <segue destination="Oep-NQ-Ge4" kind="show" identifier="showDetails" id="QrR-ir-1Ix"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HT0-CA-lkM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -68,7 +65,7 @@
         <!--Title-->
         <scene sceneID="rFh-4f-lqh">
             <objects>
-                <viewController id="Oep-NQ-Ge4" customClass="DetailViewController" customModule="FF" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="detailVC" id="Oep-NQ-Ge4" customClass="DetailViewController" customModule="FF" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="h14-Gz-4g7">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -203,6 +200,7 @@
                         <viewLayoutGuide key="safeArea" id="DHD-QQ-01G"/>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="cCD-lA-AeM"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="counterStack" destination="UQs-iN-kOz" id="0nm-YX-FLV"/>
                         <outlet property="forkCounter" destination="yH2-2g-9Q3" id="03W-rg-GBZ"/>
